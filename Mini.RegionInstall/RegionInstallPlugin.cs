@@ -70,7 +70,9 @@ namespace Mini.RegionInstall
 				this.RemoveRegions(rmRegions);
 			}
 
-			ServerManager.Instance.AvailableRegions = (IRegionInfo[])ServerManager.DefaultRegions.Clone();
+			IRegionInfo[] defaultRegions = new IRegionInfo[ServerManager.DefaultRegions.Length];
+			Array.Copy(ServerManager.DefaultRegions, defaultRegions, ServerManager.DefaultRegions.Length);
+			ServerManager.Instance.AvailableRegions = defaultRegions;
 
 			if (regions != null && regions.Value.Length != 0)
 			{
