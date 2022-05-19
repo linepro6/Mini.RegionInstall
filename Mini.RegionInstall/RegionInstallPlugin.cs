@@ -70,7 +70,7 @@ namespace Mini.RegionInstall
 				this.RemoveRegions(rmRegions);
 			}
 
-			ServerManager.AvailableRegions = new IRegionInfo[0];
+			ServerManager.Instance.AvailableRegions = new IRegionInfo[0];
 			ServerManager.DefaultRegions = new IRegionInfo[0];
 
 			if (regions != null && regions.Value.Length != 0)
