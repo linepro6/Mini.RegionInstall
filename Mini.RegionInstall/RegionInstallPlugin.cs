@@ -62,7 +62,7 @@ namespace Mini.RegionInstall
 				string.Empty,
 				"Comma-seperated list of region names that should be removed.");
 
-			var regionsCount = ServerManager.DefaultRegions.Length < 4 ? ServerManager.DefaultRegions.Length : 4;
+			var regionsCount = ServerManager.DefaultRegions.Length < 3 ? ServerManager.DefaultRegions.Length : 3;
 			IRegionInfo[] defaultRegions = new IRegionInfo[regionsCount];
 			Array.Copy(ServerManager.DefaultRegions, defaultRegions, regionsCount);
 			ServerManager.DefaultRegions = defaultRegions;
