@@ -70,9 +70,6 @@ namespace Mini.RegionInstall
 				this.RemoveRegions(rmRegions);
 			}
 
-			ServerManager.Instance.AvailableRegions = new IRegionInfo[0];
-			ServerManager.DefaultRegions = new IRegionInfo[0];
-
 			if (regions != null && regions.Value.Length != 0)
 			{
 				this.Log.LogInfo("Adding User Regions");
@@ -158,6 +155,7 @@ namespace Mini.RegionInstall
 			IEnumerable<IRegionInfo> newRegions = ServerManager.Instance.AvailableRegions.Where(
 				(IRegionInfo r) => Array.FindIndex(regionNames, (string name) => name.Equals(r.Name, StringComparison.OrdinalIgnoreCase)) == -1);
 			ServerManager.Instance.AvailableRegions = newRegions.ToArray();
+			ServerManager.DefaultRegions = newRegions.ToArray();
 		}
 
 		/**
