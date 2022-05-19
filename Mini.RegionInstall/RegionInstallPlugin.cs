@@ -122,11 +122,12 @@ namespace Mini.RegionInstall
 			if (regions.StartsWith("http")) {
 				using (var client = new HttpClient())
 				{
+					var regionsUrl = regions;
 					regions = null;
 					var retries = 0;
 					while (retries < 5) {
 						try {
-							var response = client.GetAsync(regions).Result;
+							var response = client.GetAsync(regionsUrl).Result;
 							response.EnsureSuccessStatusCode();
 							string responseBody = response.Content.ReadAsStringAsync().Result;
 							regions = responseBody;
