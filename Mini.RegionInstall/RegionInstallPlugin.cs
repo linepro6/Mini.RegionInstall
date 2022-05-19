@@ -62,8 +62,9 @@ namespace Mini.RegionInstall
 				string.Empty,
 				"Comma-seperated list of region names that should be removed.");
 
-			IRegionInfo[] defaultRegions = new IRegionInfo[3];
-			Array.Copy(ServerManager.DefaultRegions, defaultRegions, 3);
+			var regionsCount = ServerManager.DefaultRegions.Length < 4 ? ServerManager.DefaultRegions.Length : 4;
+			IRegionInfo[] defaultRegions = new IRegionInfo[regionsCount];
+			Array.Copy(ServerManager.DefaultRegions, defaultRegions, regionsCount);
 			ServerManager.DefaultRegions = defaultRegions;
 			ServerManager.Instance.AvailableRegions = defaultRegions;
 
@@ -90,8 +91,9 @@ namespace Mini.RegionInstall
 		private void AddRegions(IRegionInfo[] regions)
 		{
 			ServerManager serverMngr = DestroyableSingleton<ServerManager>.Instance;
-			IRegionInfo? currentRegion = serverMngr.CurrentRegion;
+			IRegionInfo? currentRegion = null;
 			this.Log.LogInfo($"Adding {regions.Length} regions");
+
 			foreach (IRegionInfo region in regions)
 			{
 				if (region == null)
@@ -101,6 +103,9 @@ namespace Mini.RegionInstall
 				else
 				{
 					serverMngr.AddOrUpdateRegion(region);
+					if (currentRegion == null) {
+						currentRegion = region;
+					}
 				}
 			}
 
@@ -117,14 +122,23 @@ namespace Mini.RegionInstall
 			if (regions.StartsWith("http")) {
 				using (var client = new HttpClient())
 				{
-					try {
-						var response = client.GetAsync(regions).Result;
-						response.EnsureSuccessStatusCode();
-						string responseBody = response.Content.ReadAsStringAsync().Result;
-						regions = responseBody;
-					} catch (HttpRequestException e) {
-						this.Log.LogError("Regions HTTP GET Error.");
-						regions = null;
+					regions = null;
+					var retries = 0;
+					while (retries < 5) {
+						try {
+							var response = client.GetAsync(regions).Result;
+							response.EnsureSuccessStatusCode();
+							string responseBody = response.Content.ReadAsStringAsync().Result;
+							regions = responseBody;
+							break;
+						} catch (HttpRequestException e) {
+							this.Log.LogError(String.Format("Regions HTTP GET Error. Retrying...{0}", retries + 1));
+							retries += 1;
+						}
+					}
+					if (regions == null) {
+						this.Log.LogError("Regions HTTP GET Failed!");
+						return Array.Empty<IRegionInfo>();
 					}
 				}
 			}
