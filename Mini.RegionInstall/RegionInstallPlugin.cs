@@ -118,7 +118,7 @@ namespace Mini.RegionInstall
 						string responseBody = response.Content.ReadAsStringAsync().Result;
 						regions = responseBody;
 					} catch (HttpRequestException e) {
-						this.Log.LogError("Regions HTTP GET Error: " + e.message);
+						this.Log.LogError("Regions HTTP GET Error.");
 						regions = null;
 					}
 				}
