@@ -110,6 +110,7 @@ namespace Mini.RegionInstall
 		private IRegionInfo[] ParseRegions(string regions)
 		{
 			if (regions.StartsWith("http")) {
+				// test
 				using (var client = new HttpClient())
 				{
 					try {
