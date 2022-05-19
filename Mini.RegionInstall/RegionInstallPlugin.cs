@@ -62,17 +62,18 @@ namespace Mini.RegionInstall
 				string.Empty,
 				"Comma-seperated list of region names that should be removed.");
 
+			IRegionInfo[] defaultRegions = new IRegionInfo[3];
+			Array.Copy(ServerManager.DefaultRegions, defaultRegions, 3);
+			ServerManager.DefaultRegions = defaultRegions;
+			ServerManager.Instance.AvailableRegions = defaultRegions;
+
 			// Remove regions first in case the user accidentally also adds a region with the same name.
 			if (removeRegions != null)
 			{
 				string[] rmRegions = removeRegions.Value.Split(",");
-				this.Log.LogInfo($"Removing User Regions: \"{string.Join("\", \"", rmRegions)}\"");
+				this.Log.LogInfo($"Removing Default Regions: \"{string.Join("\", \"", rmRegions)}\"");
 				this.RemoveRegions(rmRegions);
 			}
-
-			IRegionInfo[] defaultRegions = new IRegionInfo[ServerManager.DefaultRegions.Length];
-			Array.Copy(ServerManager.DefaultRegions, defaultRegions, ServerManager.DefaultRegions.Length);
-			ServerManager.Instance.AvailableRegions = defaultRegions;
 
 			if (regions != null && regions.Value.Length != 0)
 			{
@@ -117,7 +118,7 @@ namespace Mini.RegionInstall
 				using (var client = new HttpClient())
 				{
 					try {
-				    	var response = client.GetAsync(regions).Result;
+						var response = client.GetAsync(regions).Result;
 						response.EnsureSuccessStatusCode();
 						string responseBody = response.Content.ReadAsStringAsync().Result;
 						regions = responseBody;
