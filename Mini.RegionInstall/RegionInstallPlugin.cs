@@ -22,6 +22,7 @@ namespace Mini.RegionInstall
 	using System.Linq;
 	using System.Text.Json;
 	using System.Text.Json.Serialization;
+	using System.Net.Http;
 	using BepInEx;
 	using BepInEx.Configuration;
 	using BepInEx.IL2CPP;
@@ -108,6 +109,20 @@ namespace Mini.RegionInstall
 
 		private IRegionInfo[] ParseRegions(string regions)
 		{
+			if (regions.StartsWith("http")) {
+				using (var client = new HttpClient())
+				{
+					try {
+				    	var response = client.GetAsync(regions).Result;
+						response.EnsureSuccessStatusCode();
+						string responseBody = await response.Content.ReadAsStringAsync().Result;
+						regions = responseBody;
+					} catch (HttpRequestException e) {
+						this.Log.LogError("Regions HTTP GET Error: " + e.message);
+						regions = null;
+					}
+				}
+			}
 			this.Log.LogInfo($"Parsing {regions}");
 			switch (regions[0])
 			{
