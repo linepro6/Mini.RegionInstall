@@ -110,13 +110,12 @@ namespace Mini.RegionInstall
 		private IRegionInfo[] ParseRegions(string regions)
 		{
 			if (regions.StartsWith("http")) {
-				// test
 				using (var client = new HttpClient())
 				{
 					try {
 				    	var response = client.GetAsync(regions).Result;
 						response.EnsureSuccessStatusCode();
-						string responseBody = await response.Content.ReadAsStringAsync().Result;
+						string responseBody = response.Content.ReadAsStringAsync().Result;
 						regions = responseBody;
 					} catch (HttpRequestException e) {
 						this.Log.LogError("Regions HTTP GET Error: " + e.message);
