@@ -70,6 +70,8 @@ namespace Mini.RegionInstall
 				this.RemoveRegions(rmRegions);
 			}
 
+			ServerManager.Instance.AvailableRegions = (IRegionInfo[])ServerManager.DefaultRegions.Clone();
+
 			if (regions != null && regions.Value.Length != 0)
 			{
 				this.Log.LogInfo("Adding User Regions");
