@@ -91,29 +91,27 @@ namespace Mini.RegionInstall
 		private void AddRegions(IRegionInfo[] regions)
 		{
 			ServerManager serverMngr = DestroyableSingleton<ServerManager>.Instance;
-			IRegionInfo? currentRegion = null;
 			this.Log.LogInfo($"Adding {regions.Length} regions");
+
+			var userRegions = new List<IRegionInfo>();
 
 			foreach (IRegionInfo region in regions)
 			{
 				if (region == null)
 				{
-					this.Log.LogError("Could not add region");
+					this.Log.LogError("Could not add null region");
 				}
 				else
 				{
-					serverMngr.AddOrUpdateRegion(region);
-					if (currentRegion == null) {
-						currentRegion = region;
-					}
+					userRegions.Add(region);
 				}
 			}
 
-			// AU remembers the previous region that was set, so we need to restore it
-			if (currentRegion != null)
-			{
-				this.Log.LogDebug("Resetting previous region");
-				serverMngr.SetRegion(currentRegion);
+			var allRegions = ServerManager.DefaultRegions.Concat(userRegions.ToArray());
+			ServerManager.DefaultRegions = allRegions;
+			serverMngr.AvailableRegions = allRegions;
+			if (allRegions.Length >= 1) {
+				serverMngr.SetRegion(allRegions[0]);
 			}
 		}
 
