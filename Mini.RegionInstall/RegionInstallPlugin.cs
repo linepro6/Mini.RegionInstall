@@ -107,7 +107,7 @@ namespace Mini.RegionInstall
 				}
 			}
 
-			var allRegions = ServerManager.DefaultRegions.Concat(userRegions.ToArray());
+			var allRegions = ServerManager.DefaultRegions.Concat(userRegions.ToArray()).ToArray();
 			ServerManager.DefaultRegions = allRegions;
 			serverMngr.AvailableRegions = allRegions;
 			if (allRegions.Length >= 1) {
