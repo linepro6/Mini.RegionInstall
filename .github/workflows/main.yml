@@ -21,10 +21,10 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: Mini.RegionInstall.dll
-          path: output/Mini.RegionInstall.dll
+          name: Mini.RegionInstall.Plus.dll
+          path: output/bin/Mini.RegionInstall.Plus.dll
 
       - uses: actions/upload-artifact@v2
         with:
-          name: Mini.RegionInstall-NoReactor.dll
-          path: output/Mini.RegionInstall-NoReactor.dll
+          name: Mini.RegionInstall.Plus-NoReactor.dll
+          path: output/bin-noreactor/Mini.RegionInstall.Plus.dll
