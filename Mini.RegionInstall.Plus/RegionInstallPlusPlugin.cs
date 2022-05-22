@@ -23,7 +23,6 @@ namespace Mini.RegionInstall.Plus
 	using System.Net.Http;
 	using System.Text.Json;
 	using System.Text.Json.Serialization;
-	using System.Threading.Tasks;
 	using BepInEx;
 	using BepInEx.Configuration;
 	using BepInEx.IL2CPP;
@@ -65,7 +64,7 @@ namespace Mini.RegionInstall.Plus
 			if (regions.Value != string.Empty)
 			{
 				this.Log.LogInfo("Starting Mini.RegionInstall.Plus...");
-				Task.Run(() => this.UpdateRegions(regions.Value, keptRegions.Value));
+				this.UpdateRegions(regions.Value, keptRegions.Value);
 			}
 			else
 			{
@@ -74,7 +73,7 @@ namespace Mini.RegionInstall.Plus
 		}
 
 		// [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S3267:Loops should be simplified with \"LINQ\" expressions", Justification = "<挂起>")]
-		private async Task UpdateRegions(string regionsConfig, string keptRegionsConfig)
+		private void UpdateRegions(string regionsConfig, string keptRegionsConfig)
 		{
 			var defaultRegions = ServerManager.DefaultRegions;
 			var regions = new List<IRegionInfo>();
@@ -85,6 +84,7 @@ namespace Mini.RegionInstall.Plus
 			{
 				if (keptRegions.Contains(region.Name))
 				{
+					this.Log.LogInfo($"Adding Default Region \"{region.Name}\"");
 					regions.Add(region);
 				}
 			}
@@ -100,9 +100,9 @@ namespace Mini.RegionInstall.Plus
 					try
 					{
 						var client = new HttpClient();
-						var response = await client.GetAsync(regionsUrl);
+						var response = client.GetAsync(regionsUrl).Result;
 						response.EnsureSuccessStatusCode();
-						regionsConfig = await response.Content.ReadAsStringAsync();
+						regionsConfig = response.Content.ReadAsStringAsync().Result;
 						break;
 					}
 					catch (Exception e)
@@ -129,8 +129,6 @@ namespace Mini.RegionInstall.Plus
 					return;
 				}
 
-				this.Log.LogInfo("Parse Region OK.");
-
 				IRegionInfo? defaultChooseRegion = null;
 				for (int i = 0; i < data.Regions.Length; ++i)
 				{
@@ -138,7 +136,7 @@ namespace Mini.RegionInstall.Plus
 					if (region != null)
 					{
 						regions.Add(region);
-						this.Log.LogInfo($"Adding Region \"{region.Name}\" @ {region.Servers[0].Ip}:{region.Servers[0].Port}");
+						this.Log.LogInfo($"Adding User Region \"{region.Name}\" @ {region.Servers[0].Ip}:{region.Servers[0].Port}");
 						if (i == data.CurrentRegionIdx)
 						{
 							defaultChooseRegion = region;
@@ -153,7 +151,7 @@ namespace Mini.RegionInstall.Plus
 				if (defaultChooseRegion != null)
 				{
 					serverMngr.SetRegion(defaultChooseRegion);
-					this.Log.LogInfo($"Set default region: {defaultChooseRegion.Name}");
+					this.Log.LogInfo($"Set default region: \"{defaultChooseRegion.Name}\"");
 				}
 			}
 			catch (Exception e)
@@ -175,14 +173,7 @@ namespace Mini.RegionInstall.Plus
 					JsonSerializerOptions options = new JsonSerializerOptions();
 					options.Converters.Add(new RegionInfoConverter());
 
-					this.Log.LogInfo("Deserialize...");
-
-					var result = JsonSerializer.Deserialize<ServerData>(regions, options);
-					foreach (IRegionInfo region in result.Regions)
-					{
-						this.Log.LogInfo($"Region \"{region.Name}\" @ {region.Servers[0].Ip}:{region.Servers[0].Port}");
-					}
-					return result;
+					return JsonSerializer.Deserialize<ServerData>(regions, options);
 
 				// Only the IRegionInfo array
 				case '[':
